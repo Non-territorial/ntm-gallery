@@ -1,0 +1,26 @@
+.formContainer {
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 0, 0, 0;
+  --background-end-rgb: 0, 0, 0;
+
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+
+@font-face {
+  font-family: 'Isocpeur';
+  src: url('/fonts/isocpeur.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+.fontIsocpeur {
+  font-family: 'Isocpeur', sans-serif;
+}
+
