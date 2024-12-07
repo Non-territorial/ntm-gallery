@@ -6,7 +6,7 @@ export default function ImageLarge(props: ImageProps) {
 
   const handleBuy = () => {
     // Replace this with your marketplace URL or smart contract logic
-    window.open(`https://marketplace.com/nft/${rest.id}`, '_blank');
+    window.open(`https://ntm-gallery.xyz/nft/${rest.id}`, '_blank');
   };
 
   return (
