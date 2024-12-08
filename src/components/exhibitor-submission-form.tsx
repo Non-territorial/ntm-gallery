@@ -1,0 +1,110 @@
+'use client'
+
+import { useState } from 'react'
+import '@/app/styles/custom-form.css'
+
+export default function ExhibitorSubmissionForm() {
+  const [fileCount, setFileCount] = useState(1)
+
+  const addFileInput = () => {
+    if (fileCount < 100) {
+      setFileCount(fileCount + 1)
+    }
+  }
+
+  return (
+    <div className="bg-black min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <form 
+        action="/api/submit-works" 
+        method="post" 
+        encType="multipart/form-data"
+        className="custom-form w-[90%] max-w-[500px] min-w-[300px] font-['IBM_Plex_Mono'] text-[13px] text-white pb-8"
+      >
+        <h1 className="text-2xl mb-8 text-center">NONTERRITORIAL MUSEUM</h1>
+        <p className="mb-6 text-center">Submit your works for the exhibition</p>
+
+        <fieldset className="border-none border-b-2 border-[#3b3b4f] pb-6 mb-6">
+          <label htmlFor="name" className="block mb-2">
+            Your Name:
+            <input 
+              id="name" 
+              name="name" 
+              type="text" 
+              placeholder="Full name" 
+              required 
+              className="custom-form-input w-full min-h-[2em]"
+            />
+          </label>
+
+          <label htmlFor="email" className="block mt-4 mb-2">
+            Enter Your Email:
+            <input 
+              id="email" 
+              name="email" 
+              type="email" 
+              placeholder="Enter valid email" 
+              required 
+              className="custom-form-input w-full min-h-[2em]"
+            />
+          </label>
+
+          <label htmlFor="ton-wallet" className="block mt-4 mb-2">
+            TON Wallet:
+            <input 
+              id="ton-wallet" 
+              name="ton-wallet" 
+              type="text" 
+              pattern="[a-zA-Z0-9_-]{48,64}"
+              title="Please enter a valid TON wallet address (48-64 characters, letters, numbers, hyphens, and underscores)."
+              required 
+              className="custom-form-input w-full min-h-[2em]"
+            />
+          </label>
+        </fieldset>
+
+        <fieldset className="border-none pb-6 mb-6">
+          <label className="block mb-2">Upload Your Works (1-100 files):</label>
+          {[...Array(fileCount)].map((_, index) => (
+            <input 
+              key={index}
+              type="file" 
+              name={`work-${index + 1}`} 
+              accept="image/*,video/*,audio/*,.pdf"
+              className="custom-form-input w-full min-h-[2em]"
+            />
+          ))}
+          {fileCount < 100 && (
+            <button 
+              type="button" 
+              onClick={addFileInput} 
+              className="mt-4 bg-[#3b3b4f] text-white border border-white text-sm px-4 py-2"
+            >
+              Add Another File
+            </button>
+          )}
+        </fieldset>
+
+        <div className="flex items-center mb-6 space-x-2">
+          <input 
+            type="checkbox" 
+            id="terms" 
+            name="terms" 
+            required 
+            className="custom-form-input w-4 h-4 bg-transparent border-[#616770]"
+          />
+          <label htmlFor="terms" className="text-xs">
+            I ACCEPT THE <a href="https://nonterritorial.foundation" className="underline">TERMS AND CONDITIONS</a>
+          </label>
+        </div>
+
+        <input 
+          type="submit" 
+          value="Submit Works"
+          className="block w-[60%] mx-auto h-8 text-sm bg-[#3b3b4f] border-white min-w-[250px] cursor-pointer"
+        />
+      </form>
+    </div>
+  )
+}
+
+
