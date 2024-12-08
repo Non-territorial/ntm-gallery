@@ -1,9 +1,4 @@
 import { NextResponse } from 'next/server'
-import { IncomingForm, Fields, Files } from 'formidable'
-import fs from 'fs'
-import pinataSDK from '@pinata/sdk'
-import { IncomingMessage } from 'http'
-import { Socket } from 'net'
 import type { NextRequest } from 'next/server'
 
 export const config = {
@@ -88,7 +83,6 @@ export async function POST(req: NextRequest) {
 
     const uploadedFiles = await Promise.all(uploadPromises)
 
-
     return NextResponse.json({
       success: true,
       message: 'Works submitted successfully',
@@ -97,8 +91,6 @@ export async function POST(req: NextRequest) {
       email: email,
       tonWallet: tonWallet
     })
-    // })
-  // })
   } catch (error) {
     console.error('Error processing submission:', error)
     return NextResponse.json(
