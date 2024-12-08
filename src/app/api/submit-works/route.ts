@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { headers } from 'next/headers'
 import pinataSDK from '@pinata/sdk'
 
 export async function POST(request: NextRequest) {
