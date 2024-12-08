@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import pinataSDK from '@pinata/sdk'
 
+// Remove the deprecated config export and use route segment configuration
+export const runtime = 'nodejs' // default
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData()
@@ -28,6 +32,10 @@ export async function POST(request: NextRequest) {
 
     // Upload files to Pinata
     const uploadPromises = files.map(async (file: any) => {
+      if (!(file instanceof File)) {
+        throw new Error('Invalid file object')
+      }
+      
       const fileData = await file.arrayBuffer()
       const buffer = Buffer.from(fileData)
       
