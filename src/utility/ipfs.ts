@@ -1,5 +1,12 @@
 import axios from 'axios';
 
+export function getPinataUrl(cid: string): string {
+  // Replace 'YOUR_PINATA_GATEWAY' with your actual Pinata gateway URL
+  // For example: https://gateway.pinata.cloud/ipfs/
+  const PINATA_GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY || 'https://gateway.pinata.cloud/ipfs/';
+  return `${PINATA_GATEWAY}${cid}`;
+}
+
 export async function uploadToPinata(file: File): Promise<string> {
   const formData = new FormData();
   formData.append('file', file);

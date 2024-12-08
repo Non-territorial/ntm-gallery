@@ -1,23 +1,40 @@
 'use client'
 
-import { useState } from 'react'
-import '@/app/styles/custom-form.css'
+import { useState, FormEvent } from 'react'
+import '../app/styles/custom-form.css'
 
 export default function ExhibitorSubmissionForm() {
   const [fileCount, setFileCount] = useState(1)
 
   const addFileInput = () => {
     if (fileCount < 100) {
-      setFileCount(fileCount + 1)
+      setFileCount(prevCount => prevCount + 1)
+    }
+  }
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const formData = new FormData(event.currentTarget)
+    try {
+      const response = await fetch('/api/submit-works', {
+        method: 'POST',
+        body: formData,
+      })
+      if (response.ok) {
+        alert('Submission successful!')
+      } else {
+        alert('Submission failed. Please try again.')
+      }
+    } catch (error) {
+      console.error('Error:', error)
+      alert('An error occurred. Please try again.')
     }
   }
 
   return (
     <div className="bg-black min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <form 
-        action="/api/submit-works" 
-        method="post" 
-        encType="multipart/form-data"
+        onSubmit={handleSubmit}
         className="custom-form w-[90%] max-w-[500px] min-w-[300px] font-['IBM_Plex_Mono'] text-[13px] text-white pb-8"
       >
         <h1 className="text-2xl mb-8 text-center">NONTERRITORIAL MUSEUM</h1>
@@ -25,7 +42,7 @@ export default function ExhibitorSubmissionForm() {
 
         <fieldset className="border-none border-b-2 border-[#3b3b4f] pb-6 mb-6">
           <label htmlFor="name" className="block mb-2">
-            Your Name:
+            YOUR NAME:
             <input 
               id="name" 
               name="name" 
@@ -37,7 +54,7 @@ export default function ExhibitorSubmissionForm() {
           </label>
 
           <label htmlFor="email" className="block mt-4 mb-2">
-            Enter Your Email:
+            ENTER YOUR EMAIL:
             <input 
               id="email" 
               name="email" 
@@ -49,7 +66,7 @@ export default function ExhibitorSubmissionForm() {
           </label>
 
           <label htmlFor="ton-wallet" className="block mt-4 mb-2">
-            TON Wallet:
+            TON WALLET:
             <input 
               id="ton-wallet" 
               name="ton-wallet" 
@@ -63,7 +80,7 @@ export default function ExhibitorSubmissionForm() {
         </fieldset>
 
         <fieldset className="border-none pb-6 mb-6">
-          <label className="block mb-2">Upload Your Works (1-100 files):</label>
+          <label className="block mb-2">UPLOAD YOUR WORKS (1-100 FILES):</label>
           {[...Array(fileCount)].map((_, index) => (
             <input 
               key={index}
@@ -86,22 +103,23 @@ export default function ExhibitorSubmissionForm() {
 
         <div className="flex items-center mb-6 space-x-2">
           <input 
-            type="checkbox" 
+            type="radio" 
             id="terms" 
             name="terms" 
             required 
             className="custom-form-input w-4 h-4 bg-transparent border-[#616770]"
           />
           <label htmlFor="terms" className="text-xs">
-            I ACCEPT THE <a href="https://nonterritorial.foundation" className="underline">TERMS AND CONDITIONS</a>
+            I ACCEPT THE <a href="https://nonterritorial.foundation" target="_blank" rel="noopener noreferrer" className="underline">TERMS AND CONDITIONS</a>
           </label>
         </div>
 
-        <input 
-          type="submit" 
-          value="Submit Works"
-          className="block w-[60%] mx-auto h-8 text-sm bg-[#3b3b4f] border-white min-w-[250px] cursor-pointer"
-        />
+        <button 
+          type="submit"
+          className="custom-form-input block w-[60%] mx-auto h-8 text-sm bg-[#3b3b4f] border-white min-w-[250px] cursor-pointer"
+        >
+          Submit Works
+        </button>
       </form>
     </div>
   )
