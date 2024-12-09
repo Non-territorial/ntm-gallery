@@ -4,7 +4,7 @@ import { PinataSDK } from 'pinata-web3';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-export const maxDuration = 300; // 5 minutes max duration for Vercel Hobby Plan
+export const maxDuration = 60; // 5 minutes max duration for Vercel Hobby Plan
 
 // Helper function for error responses
 function errorResponse(message: string, status = 500, details?: any) {
