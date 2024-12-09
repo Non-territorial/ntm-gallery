@@ -1,7 +1,7 @@
-'use client'
+'use client';
 
-import React from 'react'
-import { getPinataUrl } from '../utility/ipfs'
+import React from 'react';
+import { getPinataUrl } from '../utility/ipfs';
 
 interface NFTDisplayProps {
   cid: string
@@ -9,7 +9,7 @@ interface NFTDisplayProps {
 }
 
 export function NFTDisplay({ cid, mimeType }: NFTDisplayProps) {
-  const pinataUrl = getPinataUrl(cid)
+  const pinataUrl = getPinataUrl(cid);
 
   if (mimeType.startsWith('image/')) {
     return (
@@ -19,21 +19,21 @@ export function NFTDisplay({ cid, mimeType }: NFTDisplayProps) {
         className="max-w-full h-auto"
         loading="lazy"
       />
-    )
+    );
   } else if (mimeType.startsWith('video/')) {
     return (
       <video controls className="max-w-full h-auto">
         <source src={pinataUrl} type={mimeType} />
         Your browser does not support the video tag.
       </video>
-    )
+    );
   } else if (mimeType.startsWith('audio/')) {
     return (
       <audio controls className="w-full max-w-md my-2">
         <source src={pinataUrl} type={mimeType} />
         Your browser does not support the audio tag.
       </audio>
-    )
+    );
   } else if (mimeType === 'application/pdf') {
     return (
       <div className="w-full aspect-[16/9] relative">
@@ -43,9 +43,9 @@ export function NFTDisplay({ cid, mimeType }: NFTDisplayProps) {
           title="PDF document"
         />
       </div>
-    )
+    );
   } else {
-    return <p className="text-red-500">Unsupported media type</p>
+    return <p className="text-red-500">Unsupported media type</p>;
   }
 }
 
