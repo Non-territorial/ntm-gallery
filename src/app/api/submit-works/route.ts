@@ -1,187 +1,87 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import pinataSDK from '@pinata/sdk';
+import { PinataSDK } from 'pinata-web3';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-export const maxDuration = 300; // Set maximum duration to 5 minutes
+export const maxDuration = 300; // 5 minutes max duration for Vercel Hobby Plan
+
+// Helper function for error responses
+function errorResponse(message: string, status = 500, details?: any) {
+  return NextResponse.json({ success: false, message, details }, { status });
+}
 
 export async function POST(request: NextRequest) {
-  console.log('Request received:', { headers: Object.fromEntries(request.headers), method: request.method });
   console.log('API route hit - Starting submission process');
-  
-  // First, verify environment variables are set
-  if (!process.env.NEXT_PUBLIC_PINATA_API_KEY || !process.env.NEXT_PUBLIC_PINATA_SECRET_API_KEY) {
-    console.error('Missing Pinata API keys in environment variables');
-    return NextResponse.json(
-      { 
-        success: false, 
-        message: 'Server configuration error - Missing API keys',
-      },
-      { status: 500 }
-    );
+
+  // Verify Pinata environment variables
+  if (!process.env.PINATA_JWT || !process.env.PINATA_GATEWAY) {
+    console.error('Missing Pinata API keys or gateway in environment variables');
+    return errorResponse('Server configuration error - Missing API keys', 500);
   }
 
   try {
-    // Initialize Pinata client with error handling
+    // Initialize Pinata client
     console.log('Initializing Pinata client...');
-    let pinata;
-    try {
-      pinata = new pinataSDK({
-        pinataApiKey: process.env.NEXT_PUBLIC_PINATA_API_KEY,
-        pinataSecretApiKey: process.env.NEXT_PUBLIC_PINATA_SECRET_API_KEY,
-      });
-    } catch (initError) {
-      console.error('Failed to initialize Pinata client:', initError);
-      return NextResponse.json(
-        { 
-          success: false, 
-          message: 'Failed to initialize Pinata client',
-          error: initError instanceof Error ? initError.message : 'Initialization error',
-        },
-        { status: 500 }
-      );
-    }
+    const pinata = new PinataSDK({
+      pinataJwt: process.env.PINATA_JWT,
+      pinataGateway: process.env.PINATA_GATEWAY,
+    });
 
-    // Test Pinata authentication with timeout
-    console.log('Testing Pinata authentication...');
-    try {
-      const authTimeout = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Authentication timeout')), 10000)
-      );
-      await Promise.race([
-        pinata.testAuthentication(),
-        authTimeout,
-      ]);
-      console.log('Pinata authentication successful');
-    } catch (authError) {
-      console.error('Pinata authentication failed:', authError);
-      return NextResponse.json(
-        { 
-          success: false, 
-          message: 'Failed to authenticate with Pinata',
-          error: authError instanceof Error ? authError.message : 'Authentication error',
-        },
-        { status: 401 }
-      );
-    }
-
-    // Parse form data with error handling
+    // Parse form data
     console.log('Parsing form data...');
-    let formData;
-    try {
-      formData = await request.formData();
-    } catch (formError) {
-      console.error('Failed to parse form data:', formError);
-      return NextResponse.json(
-        { 
-          success: false, 
-          message: 'Failed to parse form data',
-          error: formError instanceof Error ? formError.message : 'Form parsing error',
-        },
-        { status: 400 }
-      );
-    }
-    
-    // Process form data
-    const name = formData.get('name');
-    const email = formData.get('email');
-    const tonWallet = formData.get('ton-wallet');
-    
-    console.log('Validating form data:', { name: !!name, email: !!email, tonWallet: !!tonWallet });
-    
+    const formData = await request.formData();
+
+    const name = formData.get('name')?.toString();
+    const email = formData.get('email')?.toString();
+    const tonWallet = formData.get('ton-wallet')?.toString();
+
     // Validate required fields
     if (!name || !email || !tonWallet) {
-      console.error('Missing required fields');
-      return NextResponse.json(
-        { 
-          success: false, 
-          message: 'Missing required fields',
-          details: {
-            name: !name ? 'missing' : 'present',
-            email: !email ? 'missing' : 'present',
-            tonWallet: !tonWallet ? 'missing' : 'present',
-          },
-        },
-        { status: 400 }
-      );
+      console.error('Missing required fields:', { name, email, tonWallet });
+      return errorResponse('Missing required fields', 400, { name, email, tonWallet });
     }
 
-    // Handle file uploads with detailed logging
+    // Process file uploads
     console.log('Processing file uploads...');
-    const files = [];
+    const files: File[] = [];
     for (let i = 1; i <= 100; i++) {
       const file = formData.get(`work-${i}`);
       if (file instanceof File) {
-        console.log(`Found file ${i}:`, { name: file.name, type: file.type, size: file.size });
+        console.log(`Found file ${i}: ${file.name}`);
         files.push(file);
       }
     }
 
     if (files.length === 0) {
       console.error('No files uploaded');
-      return NextResponse.json(
-        { 
-          success: false, 
-          message: 'No files uploaded',
-        },
-        { status: 400 }
-      );
+      return errorResponse('No files uploaded', 400);
     }
 
     console.log(`Found ${files.length} files to upload`);
 
-    // Upload files to Pinata with improved error handling
-    console.log('Starting file uploads to Pinata...');
-    const uploadPromises = files.map(async (file: File, index: number) => {
+    // Upload files to Pinata
+    const uploadPromises = files.map(async (file, index) => {
       try {
-        console.log(`Processing file ${index + 1}: ${file.name}`);
-        const fileData = await file.arrayBuffer();
-        const buffer = Buffer.from(fileData);
-        
-        console.log(`Uploading file ${index + 1} to Pinata...`);
-        const result = await pinata.pinFileToIPFS(buffer, {
-          pinataMetadata: {
-            name: file.name,
-          },
-          pinataOptions: {
-            cidVersion: 1,
+        console.log(`Uploading file ${index + 1}: ${file.name}`);
+        const result = await pinata.upload.file(file, {
+          metadata: {
+            name: file.name, // Add metadata to the file
           },
         });
-        
-        console.log(`File ${index + 1} uploaded successfully. IPFS Hash: ${result.IpfsHash}`);
 
-        // Add metadata with error handling
-        try {
-          console.log(`Adding metadata for file ${index + 1}...`);
-          await pinata.hashMetadata(result.IpfsHash, {
-            keyvalues: {
-              artist: name.toString(),
-              email: email.toString(),
-              tonWallet: tonWallet.toString(),
-            } as any, // Type assertion to avoid TS error
-          });
-          console.log(`Metadata added for file ${index + 1}`);
-        } catch (metadataError) {
-          console.error(`Failed to add metadata for file ${index + 1}:`, metadataError);
-          // Continue with the upload even if metadata fails
-        }
-        
-        return {
-          originalName: file.name,
-          ipfsHash: result.IpfsHash,
-        };
-      } catch (uploadError) {
-        console.error(`Error uploading file ${file.name}:`, uploadError);
-        throw uploadError;
+        console.log(`File ${index + 1} uploaded successfully: ${file.name}`);
+        return { originalName: file.name, ipfsHash: result.IpfsHash };
+      } catch (error) {
+        console.error(`Error uploading file ${file.name}:`, error);
+        throw error;
       }
     });
 
-    console.log('Waiting for all file uploads to complete...');
     const uploadedFiles = await Promise.all(uploadPromises);
     console.log('All files uploaded successfully');
 
-    console.log('Submission process completed successfully');
+    // Respond with success
     return NextResponse.json({
       success: true,
       message: 'Works submitted successfully',
@@ -192,16 +92,8 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error processing submission:', error);
-    console.error('Full error object:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
-    return NextResponse.json(
-      { 
-        success: false, 
-        message: 'Error processing submission',
-        error: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 500 }
-    );
+    return errorResponse('Error processing submission', 500, {
+      error: error instanceof Error ? error.message : error,
+    });
   }
 }
-
-
