@@ -63,6 +63,7 @@
     "swr": "^2.2.5",
     "tailwind-merge": "^2.5.5",
     "tailwindcss": "^3.4.16",
+    "tonweb": "^0.0.66",
     "ts-exif-parser": "^0.2.2",
     "typescript": "5.6.2",
     "undici": "^6.19.8",
