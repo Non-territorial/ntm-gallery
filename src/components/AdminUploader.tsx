@@ -1,72 +1,61 @@
 'use client'
 
-import React, { useState } from 'react'
-import { uploadToPinata } from '../utility/ipfs'
-import { Button } from '@/components/ui/button'
+import React, { useState, FormEvent } from 'react'
 
-export default function AdminUploader() {
-  const [file, setFile] = useState<File | null>(null)
-  const [uploading, setUploading] = useState(false)
-  const [ipfsHash, setIpfsHash] = useState<string | null>(null)
-  const [error, setError] = useState<string | null>(null)
+export function AdminUploader() {
+  const [isUploading, setIsUploading] = useState(false)
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setFile(e.target.files[0])
-      setError(null)
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setIsUploading(true)
+    try {
+      const formData = new FormData(event.currentTarget)
+      const response = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: formData,
+      })
+      if (response.ok) {
+        alert('Upload successful!')
+      } else {
+        alert('Upload failed. Please try again.')
+      }
+    } catch (error) {
+      console.error('Error:', error)
+      alert('An error occurred. Please try again.')
+    } finally {
+      setIsUploading(false)
     }
   }
 
-  const handleUpload = async () => {
-    if (!file) {
-      setError('No file selected');
-      return;
-    }
-
-    setUploading(true);
-    setError(null);
-    
-    try {
-      const hash = await uploadToPinata(file);
-      setIpfsHash(hash);
-    } catch (error) {
-      console.error('Upload failed:', error);
-      setIpfsHash(null);
-      setError(error instanceof Error ? error.message : 'Unknown error occurred');
-    } finally {
-      setUploading(false);
-    }
-  };
-
   return (
-    <div className="space-y-4">
-      <input
-        type="file"
-        onChange={handleFileChange}
-        className="w-full text-white bg-transparent border border-[#616770] p-2 rounded-md"
-        disabled={uploading}
-      />
-      
-      <Button
-        onClick={handleUpload}
-        disabled={!file || uploading}
-        className="w-full bg-[#3b3b4f] text-white border border-white hover:bg-[#4a4a5f]"
+    <div className="bg-black min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <form 
+        onSubmit={handleSubmit}
+        className="w-[90%] max-w-[500px] min-w-[300px] space-y-6"
       >
-        {uploading ? 'Uploading...' : 'Upload to Pinata'}
-      </Button>
-
-      {error && (
-        <div className="mt-4 p-4 bg-red-500 text-white rounded-md">
-          Error: {error}
+        <h2 className="text-2xl font-bold text-white text-center">Admin Upload</h2>
+        
+        <div>
+          <label className="block text-sm font-medium text-white">
+            Upload Files
+            <input 
+              type="file" 
+              name="files" 
+              multiple 
+              accept="image/*,video/*,audio/*,.pdf"
+              className="mt-1 block w-full text-white bg-transparent border border-gray-600 rounded-md shadow-sm"
+            />
+          </label>
         </div>
-      )}
 
-      {ipfsHash && (
-        <div className="mt-4 p-4 bg-[#3b3b4f] rounded-md">
-          <p>Upload successful!</p>
-          <p className="break-all">IPFS Hash: {ipfsHash}</p>
-        </div>
-      )}
+        <button 
+          type="submit"
+          disabled={isUploading}
+          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#3b3b4f] hover:bg-[#2d2d3d] disabled:opacity-50"
+        >
+          {isUploading ? 'Uploading...' : 'Upload'}
+        </button>
+      </form>
     </div>
   )
 }

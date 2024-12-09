@@ -2,7 +2,10 @@ import ExhibitorSubmissionForm from '@/components/exhibitor-submission-form'
 
 export default function ExhibitorSubmissionPage() {
   return (
-    <ExhibitorSubmissionForm />
+    <div className="min-h-screen bg-black">
+      <ExhibitorSubmissionForm />
+    </div>
   )
 }
+
 
