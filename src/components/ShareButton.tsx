@@ -1,5 +1,3 @@
-import { TbPhotoShare } from 'react-icons/tb';
-import PathLoaderButton from './primitives/PathLoaderButton';
 import { clsx } from 'clsx/lite';
 
 export default function ShareButton({
@@ -16,18 +14,18 @@ export default function ShareButton({
   className?: string
 }) {
   return (
-    <PathLoaderButton
-      path={path}
+    <button
       className={clsx(
         className,
         dim ? 'text-dim' : 'text-medium',
+        'inline-flex items-center gap-2'
       )}
-      icon={<TbPhotoShare size={16} />}
-      spinnerColor="dim"
-      prefetch={prefetch}
-      shouldScroll={shouldScroll}
-      styleAs="link"
-      shouldReplace
-    />
+      onClick={() => {
+        console.log('ShareButton clicked!');
+        alert(`This would initiate a BUY process for path: ${path}`);
+      }}
+    >
+      <span>BUY</span>
+    </button>
   );
 }
