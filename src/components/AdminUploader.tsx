@@ -1,29 +1,29 @@
-'use client'
+'use client';
 
-import React, { useState, FormEvent } from 'react'
+import React, { useState, FormEvent } from 'react';
 
 export function AdminUploader() {
-  const [isUploading, setIsUploading] = useState(false)
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    setIsUploading(true)
+    event.preventDefault();
+    setIsUploading(true);
     try {
-      const formData = new FormData(event.currentTarget)
+      const formData = new FormData(event.currentTarget);
       const response = await fetch('/api/admin/upload', {
         method: 'POST',
         body: formData,
-      })
+      });
       if (response.ok) {
-        alert('Upload successful!')
+        alert('Upload successful!');
       } else {
-        alert('Upload failed. Please try again.')
+        alert('Upload failed. Please try again.');
       }
     } catch (error) {
-      console.error('Error:', error)
-      alert('An error occurred. Please try again.')
+      console.error('Error:', error);
+      alert('An error occurred. Please try again.');
     } finally {
-      setIsUploading(false)
+      setIsUploading(false);
     }
   }
 
@@ -57,6 +57,7 @@ export function AdminUploader() {
         </button>
       </form>
     </div>
-  )
+  );
 }
+
 

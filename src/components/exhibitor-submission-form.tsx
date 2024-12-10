@@ -1,35 +1,35 @@
-'use client'
+'use client';
 
-import { useState, FormEvent } from 'react'
-import '../app/styles/custom-form.css'
+import { useState, FormEvent } from 'react';
+import '../app/styles/custom-form.css';
 
 export default function ExhibitorSubmissionForm() {
-  const [fileCount, setFileCount] = useState(1)
+  const [fileCount, setFileCount] = useState(1);
 
   const addFileInput = () => {
     if (fileCount < 100) {
-      setFileCount(prevCount => prevCount + 1)
+      setFileCount(prevCount => prevCount + 1);
     }
-  }
+  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const formData = new FormData(event.currentTarget)
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
     try {
       const response = await fetch('/api/submit-works', {
         method: 'POST',
         body: formData,
-      })
+      });
       if (response.ok) {
-        alert('Submission successful!')
+        alert('Submission successful!');
       } else {
-        alert('Submission failed. Please try again.')
+        alert('Submission failed. Please try again.');
       }
     } catch (error) {
-      console.error('Error:', error)
-      alert('An error occurred. Please try again.')
+      console.error('Error:', error);
+      alert('An error occurred. Please try again.');
     }
-  }
+  };
 
   return (
     <div className="bg-black min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -122,7 +122,7 @@ export default function ExhibitorSubmissionForm() {
         </button>
       </form>
     </div>
-  )
+  );
 }
 
 

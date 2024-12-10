@@ -20,14 +20,14 @@ export async function uploadToPinata(file: File): Promise<string> {
 
   try {
     const res = await axios.post(
-      "https://api.pinata.cloud/pinning/pinFileToIPFS",
+      'https://api.pinata.cloud/pinning/pinFileToIPFS',
       formData,
       {
         headers: {
           'Content-Type': `multipart/form-data; boundary=${(formData as any)._boundary}`,
           'pinata_api_key': pinataApiKey,
-          'pinata_secret_api_key': pinataSecretApiKey
-        }
+          'pinata_secret_api_key': pinataSecretApiKey,
+        },
       }
     );
 

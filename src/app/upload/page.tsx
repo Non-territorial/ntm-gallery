@@ -1,7 +1,7 @@
-'use client'
+'use client';
 
-import React from 'react'
-import AdminUploader from '@/components/AdminUploader'
+import React from 'react';
+import { AdminUploader } from '@/components/AdminUploader';
 
 export default function AdminUploadPage() {
   return (
@@ -24,5 +24,5 @@ export default function AdminUploadPage() {
         <p>Recent uploads will be displayed here.</p>
       </div>
     </div>
-  )
+  );
 }
