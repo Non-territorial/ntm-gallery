@@ -7,7 +7,7 @@ export default function ExhibitorSubmissionForm() {
   const [fileCount, setFileCount] = useState(1);
 
   const addFileInput = () => {
-    if (fileCount < 100) {
+    if (fileCount < 1000) {
       setFileCount(prevCount => prevCount + 1);
     }
   };
@@ -79,8 +79,22 @@ export default function ExhibitorSubmissionForm() {
           </label>
         </fieldset>
 
+        <fieldset className="border-none border-b-2 border-[#3b3b4f] pb-6 mb-6">
+          <label htmlFor="exhibition-title" className="block mb-2">
+            EXHIBITION TITLE:
+            <input 
+              id="exhibition-title" 
+              name="exhibition-title" 
+              type="text" 
+              placeholder="Enter exhibition title" 
+              required 
+              className="custom-form-input w-full min-h-[2em]"
+            />
+          </label>
+        </fieldset>
+
         <fieldset className="border-none pb-6 mb-6">
-          <label className="block mb-2">UPLOAD YOUR WORKS (1-100 FILES):</label>
+          <label className="block mb-2">UPLOAD YOUR WORKS (1-1000 FILES):</label>
           {[...Array(fileCount)].map((_, index) => (
             <input 
               key={index}
@@ -90,7 +104,7 @@ export default function ExhibitorSubmissionForm() {
               className="custom-form-input w-full min-h-[2em]"
             />
           ))}
-          {fileCount < 100 && (
+          {fileCount < 1000 && (
             <button 
               type="button" 
               onClick={addFileInput} 
