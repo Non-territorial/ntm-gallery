@@ -6,6 +6,8 @@ import { getPinataUrl } from '../utility/ipfs';
 interface NFTDisplayProps {
   cid: string
   mimeType: string
+  price?: string
+  onPurchase?: () => void
 }
 
 export function NFTDisplay({ cid, mimeType }: NFTDisplayProps) {
