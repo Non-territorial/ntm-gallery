@@ -1,5 +1,5 @@
 {
-  "name": "exif-photo-blog",
+  "name": "ntm-gallery",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

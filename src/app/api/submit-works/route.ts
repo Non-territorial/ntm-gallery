@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { PinataSDK } from 'pinata-web3';
+import "dotenv/config";
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -60,18 +61,38 @@ export async function POST(request: NextRequest) {
 
     console.log(`Found ${files.length} files to upload`);
 
-    // Upload files to Pinata
+    // Upload files to Pinata and create metadata
     const uploadPromises = files.map(async (file, index) => {
       try {
         console.log(`Uploading file ${index + 1}: ${file.name}`);
-        const result = await pinata.upload.file(file, {
+        const fileUploadResult = await pinata.upload.file(file, {
           metadata: {
             name: file.name, // Add metadata to the file
           },
         });
 
+        // Create metadata JSON object for each file
+        const metadata = {
+          name: file.name,
+          description: `Uploaded by ${name}`,
+          image: `ipfs://${fileUploadResult.IpfsHash}`, // Link the file CID in the metadata
+        };
+
+        // Upload metadata JSON to Pinata
+        console.log(`Uploading metadata for ${file.name}`);
+        const metadataUploadResult = await pinata.upload.json(metadata, {
+          metadata: { name: `metadata-${file.name}` },
+        });
+
         console.log(`File ${index + 1} uploaded successfully: ${file.name}`);
-        return { originalName: file.name, ipfsHash: result.IpfsHash };
+        console.log(`File CID: ${fileUploadResult.IpfsHash}`);
+        console.log(`Metadata CID: ${metadataUploadResult.IpfsHash}`);
+
+        return {
+          originalName: file.name,
+          fileCID: fileUploadResult.IpfsHash,
+          metadataCID: metadataUploadResult.IpfsHash,
+        };
       } catch (error) {
         console.error(`Error uploading file ${file.name}:`, error);
         throw error;
@@ -79,9 +100,9 @@ export async function POST(request: NextRequest) {
     });
 
     const uploadedFiles = await Promise.all(uploadPromises);
-    console.log('All files uploaded successfully');
+    console.log('All files and metadata uploaded successfully');
 
-    // Respond with success
+    // Respond with success and return both file and metadata CIDs
     return NextResponse.json({
       success: true,
       message: 'Works submitted successfully',
