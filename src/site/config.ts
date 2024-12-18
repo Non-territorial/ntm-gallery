@@ -11,7 +11,7 @@ export const SHOULD_DEBUG_SQL = false;
 
 export const SITE_TITLE =
   process.env.NEXT_PUBLIC_SITE_TITLE ||
-  'Photo Blog';
+  'NTM Gallery';
 
 // SOURCE
 export const VERCEL_COMMIT_MESSAGE =
